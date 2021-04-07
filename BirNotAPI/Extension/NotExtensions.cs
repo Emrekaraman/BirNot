@@ -11,7 +11,7 @@ namespace BirNotAPI.Extension
     {
         public static GetNotDTO ToGetNotDTO(this Not not)
         {
-
+            //as
             return new GetNotDTO()
             {
                 Id = not.Id,
