@@ -2,21 +2,132 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>BirNot</title>
+    <link rel="icon" type="image/png" href="Images/logo.png" />
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/toastr.min.css" rel="stylesheet" />
+    <link href="Content/site.css" rel="stylesheet" />
+
 </head>
 <body>
+    <div id="uyelikSayfa">
+        <form class="form-signin giris" id="frmGirisKayit">
+            <img class="mb-4" src="Images/logo.png" alt="" width="72" height="72">
+            <div class="mb-3">
+                <div class="btn-group" id="girisKayit">
+                    <a href="#" class="btn btn-sm btn-outline-secondary active" data-tur="giris" id="switchGiris">
+                        Giriş Yap
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="kayit" id="switchKayit">
+                        Kayıt Ol
+                    </a>
+                </div>
+            </div>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="email" id="inputEmail" name="Email" class="form-control" placeholder="Email address" required autofocus>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" id="inputPassword" name="Password" class="form-control" placeholder="Password" required>
+            <label for="inputConfirmPassword" class="sr-only">Confirm Password</label>
+            <input type="password" id="inputConfirmPassword" name="ConfirmPassword" class="form-control" placeholder="Confirm password" required disabled>
+            <div class="checkbox mb-3 remember-me-div">
+                <label>
+                    <input type="checkbox" id="inputRememberMe"> Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Giriş Yap</button>
+            <p class="mt-5 mb-3 text-muted">&copy; 2017-2021</p>
+        </form>
+    </div>
+    <div id="notlarSayfa" style="display: none"></div>
+
     <script src="Scripts/jquery-3.6.0.min.js"></script>
+    <script src="Scripts/bootstrap.bundle.min.js"></script>
+    <script src="Scripts/toastr.min.js"></script>
     <script>
-        $.ajax({
-            type: "get",
-            url: "https://localhost:44365/api/Values",
-            headers: {
-                Authorization: "yRj4vlTEGn4faTXQ2IHABlvdWccci7cl-RcFmvHLAEs6W8_OqcKcrV_Dv6GPZd0s0lzmoMEFBQFYjU_vMp9JuVoh_TcRKeSQ1-uNSo2v-Hqvq7QOrju3tJwFsWYknNc7MiPzOp3uDl2TnXp6N2fwISygGYWXyp4qy4kmBiCuHWxgNkfUi4wAa19G4fHVaWMsyWpwpxGodm8r8Z319OSs8yoXtoz4mdwis1IF3k87Du0uzoTbSYjUWmCaqymu_baIlk8tckJ9NI3r2UdPjDjrgT8ZN6GbwDL_ZIIsQTlq3hpZAF3soXBqORWaL1YSWUo9hbjGWSWLrPkVcN7yYJoxLoT1VnWon0TF55CvzsokMpKIVFeKTttgKY0gS1BTNsjABuLlL3xXe3lilvC4DzLNxw2UAQfp_aU7L-TLKkMqSbfWliJg52u3L8YOX_xs_gmEyYcFA0f4WpmEiWfkjHBjLM5BRVWsn5Dn_ea5xXr4dY_5dR4PsztmeKBLClHRQCFy"
-            },
-            success: function (data) {
-                alert(data[0] + "ve" + data[1]);
+        var apiUrl = "https://localhost:44365/";
+
+        $("#girisKayit > a").click(function (event) {
+            event.preventDefault();
+            var a = this;
+            $(a).addClass("active");
+            $(a).siblings("a").removeClass("active");
+            var tur = $(this).data("tur");
+            $('.form-signin button[type="submit"]').text(
+                tur == "giris" ? "Giriş Yap" : "Kayıt Ol"
+            );
+
+            switch (tur) {
+                case "giris":
+                    $(".form-signin").removeClass("kayit").addClass("giris");
+                    $("#inputConfirmPassword").prop("disabled", true);
+                    break;
+                case "kayit":
+                    $(".form-signin").removeClass("giris").addClass("kayit");
+                    $("#inputConfirmPassword").prop("disabled", false);
+                    break;
+            }
+            $("#inputEmail").focus();
+            $("#frmGirisKayit").get(0).reset();
+
+        });
+        $("#frmGirisKayit").submit(function (event) {
+            event.preventDefault();
+            var frm = this;
+            //kayit modu
+            if ($(frm).hasClass("kayit")) {
+                $.ajax({
+                    type: "post",
+                    url: apiUrl + "api/Account/Register",
+                    data: $(frm).serialize(),
+                    success: function (data) {
+                        frm.reset();
+                        $("#switchGiris").trigger("click");
+                        toastr.success("Hesabınız Oluşturuldu. Giriş Yapabilirsiniz", "Kayıt Başarılı")
+
+                    },
+                    error: function (xhr, status, error) {
+                        showErrors(xhr.responseJSON);
+
+
+                    }
+                });
+            }
+            //giriş modu
+            else {
+                var email = $("#inputEmail").val();
+                var password = $("#inputPassword").val();
+                $.ajax({
+                    type: "post",
+                    url: apiUrl + "Token",
+                    data: { grant_type: "password", username: email, password: password },
+                    success: function (data) {
+                        var rememberMe = $("#inputRemember").prop("checked");
+                        var storage = rememberMe ? localStorage : sessionStorage;
+                        console.log(data);
+                    },
+                    error: function (xhr, status, error) {
+                        showErrors(xhr.responseJSON);
+                    }
+                });
             }
         });
+        function showErrors(data) {
+            if (data.ModelState) {
+                var ms = data.ModelState;
+
+                for (var key in ms) {
+                    var errors = ms[key];
+
+                    for (const error of errors) {
+                        toastr.error(error);
+                    }
+                }
+            }
+            else if (data.error_description) {
+                toastr.error(data.error_description);
+            }
+        }
     </script>
 </body>
 </html>
