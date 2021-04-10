@@ -1,24 +1,39 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+﻿<div class="row notes-page">
+    <div class="col-md-3">
+        <div class="notes-heading-bar">
+            <h2 class="notes-heading">Notes</h2>
+            <button class="btn btn-success" id="btnNew">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+        <div class="list-group" id="notes">
+            @*<a href="#" class="list-group-item active">
+                    Cras justo odio
+                </a>
+                <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                <a href="#" class="list-group-item">Morbi leo risus</a>
+                <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                <a href="#" class="list-group-item">Vestibulum at eros</a>*@
+        </div>
+
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    <div class="col-md-9">
+        <form id="frmNote" method="post" style="display:none">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="id" name="id" />
+            <div class="form-group">
+                <input id="title" name="title" type="text" class="form-control" placeholder="Title" required maxlength="100" />
+            </div>
+
+            <div class="form-group">
+                <textarea id="content" name="content" class="form-control" placeholder="Your Note" rows="10"></textarea>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                <button type="button" class="btn btn-danger" id="btnDelete">Delete</button>
+            </div>
+        </form>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
+
 </div>
